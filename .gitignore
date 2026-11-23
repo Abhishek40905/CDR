@@ -1,0 +1,26 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Installed packages and generated files
+node_modules/
+coverage/
+*.log
+__pycache__/
+*.py[cod]
+.DS_Store
+Thumbs.db
+/archive/
+/public/config.js
+
+# Local CDR datasets: these may contain personal or sensitive records.
+/CDR_data_subset.txt
+/Call_data.csv
+/Device_data.csv
+/agg_cdr.csv
+/cdr.csv
+/raw_cdr_data.csv
+/CDR_Gist3.csv
+/Vega_CDR.csv
+/imsi.csv

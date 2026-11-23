@@ -1,0 +1,27 @@
+{
+  "name": "tracecdr",
+  "version": "2.4.0",
+  "description": "Production-grade, secure Call Detail Record (CDR) forensic intelligence application",
+  "main": "server/index.js",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build-static.js",
+    "start": "node server/index.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "cdr",
+    "forensics",
+    "telecom",
+    "supabase",
+    "security"
+  ],
+  "author": "Google DeepMind Security & Engineering",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.48.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}

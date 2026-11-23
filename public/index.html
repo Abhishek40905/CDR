@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{var _t=localStorage.getItem("tcdr_theme");document.documentElement.dataset.theme=(_t==="light")?"light":"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TraceCDR – CDR Analysis &amp; Investigation</title>
+<link rel="stylesheet" href="./assets/css/core.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link rel="stylesheet" href="./assets/css/app.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+<div id="lg" role="dialog" aria-modal="true" aria-label="Sign in"><div class="lc"><button class="thb lgt" type="button"></button>
+<h1>TRACE<b>CDR</b></h1><div class="ls">Forensic Communications Intelligence Suite</div>
+<div id="lg1"><h2>Secure sign-in</h2>
+<label for="lgu">Email or existing username</label><input id="lgu" type="text" autocomplete="username" autocapitalize="off" spellcheck="false">
+<label for="lgp">Password</label><div class="pw"><input id="lgp" type="password" autocomplete="current-password"><button type="button" id="lgs">SHOW</button></div>
+<button class="go" id="lgb" type="button">Sign in</button><div class="msg" id="lgm" aria-live="polite"></div>
+<button type="button" class="lnk" id="lgr">Create an account</button>
+<div class="hint" id="lgh" style="display:block;margin-top:8px;font-size:11px;color:var(--mut)">Cloud access is secured by Supabase Auth and database policies.</div></div>
+<div id="lg2" style="display:none"><h2>Set a new super admin password</h2>
+<label for="lgn1">New password (min 8 characters)</label><input id="lgn1" type="password" autocomplete="new-password">
+<label for="lgn2">Confirm new password</label><input id="lgn2" type="password" autocomplete="new-password">
+<button class="go" id="lgc" type="button">Save and continue</button><div class="msg" id="lgm2" aria-live="polite"></div></div>
+<div id="lg3" style="display:none"><h2>Create account</h2>
+<label for="rgu">Email address</label><input id="rgu" type="email" autocomplete="email" autocapitalize="off" spellcheck="false">
+<label for="rgp">Choose a password (min 8 characters)</label><div class="pw"><input id="rgp" type="password" autocomplete="new-password"><button type="button" id="rgs">SHOW</button></div>
+<label for="rgq">Confirm password</label><input id="rgq" type="password" autocomplete="new-password">
+<button class="go" id="rgb" type="button">Create account</button><div class="msg" id="rgm" aria-live="polite"></div>
+<button type="button" class="lnk" id="rgx">Back to sign in</button></div>
+<div class="ft">Authorised personnel only.</div></div></div>
+<div id="um"><div class="uc"><h3>User management</h3><table><thead><tr><th>User</th><th>Role</th><th></th></tr></thead><tbody id="ut"></tbody></table>
+<div class="ar"><input id="nu" placeholder="User email" autocomplete="off"><input id="np" type="text" placeholder="Temporary password" autocomplete="off"><select id="nr"><option value="analyst">Analyst</option><option value="viewer">Viewer (read-only)</option><option value="superadmin">Super admin</option></select></div>
+<div class="ar"><button class="btn" id="ua">Add user</button><button class="btn g" id="uc">Close</button></div><div class="um-m" id="um-m"></div></div></div>
+
+<div id="intro"><canvas id="ic"></canvas><canvas id="chk"></canvas><div id="isc"></div><div id="beams"><i></i><i></i><i></i></div><div id="gr"></div><div id="tc"></div><div id="lb1"></div><div id="lb2"></div><div id="iflash"></div><button id="iskip">SKIP ▸</button><h1 id="itl">TRACE<b>CDR</b></h1><div id="ihud">Mission: trace the caller<div class="itrack"><div id="ibar"></div></div></div><div id="icap"></div><button id="ienter">INITIATE FORENSIC ANALYSIS ▸</button></div>
+<header>
+<h1>TRACE<b style="color:var(--acc)">CDR</b><small>Forensic Communications Intelligence Suite</small></h1>
+<div class="row" style="margin:0"><select id="cs" class="btn g" title="Active matter"></select><span id="src" class="tag">Reference dataset</span><span id="tel"></span></div>
+<div class="row" style="margin:0"><label class="btn">Import CDR (CSV / Excel)<input id="file" type="file" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden></label><button class="btn g" id="sample">Load demo data</button><button class="btn g" id="exp">Export view</button><button class="btn g thb" type="button"></button></div>
+</header>
+<div class="cards" id="cards"></div>
+<div class="wrap"><nav id="nav"></nav><section id="stg"><div id="crumb"></div><main id="main"></main><div id="pager"></div></section></div>
+<!-- Keep these classic scripts in order: later files depend on earlier globals. -->
+<script src="./assets/js/application-core.js"></script>
+<script src="./assets/js/theme-and-status.js"></script>
+<script src="./assets/js/progression-ui.js"></script>
+<script src="./assets/js/cinematic-intro.js"></script>
+<script src="./assets/js/dashboard-cards.js"></script>
+<script src="./assets/js/navigation-shortcuts.js"></script>
+<script src="./assets/js/navigation-layout.js"></script>
+<script src="./assets/js/data-studio.js"></script>
+<script src="./assets/js/cdr-ingestion.js"></script>
+<script src="./assets/js/region-resolver.js"></script>
+<script src="./assets/js/map-diagnostics.js"></script>
+<script src="./assets/js/pointer-effects.js"></script>
+<script src="./assets/js/intro-animation.js"></script>
+<!-- ===== DEVI · TraceCDR guide chatbot ===== -->
+
+<button id="devi-fab" aria-label="Open Devi, the TraceCDR guide" title="Ask Devi"><svg viewBox="0 0 48 48" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M24 2 28.5 12H19.5Z" stroke-width="1"/><path d="M10 3 13.5 11H6.5ZM38 3 41.5 11H34.5Z" stroke-width="1"/><path d="M10 10C10 21 14 27 24 27 34 27 38 21 38 10M24 12V46M19 40H29" fill="none" stroke-width="2.6"/></svg><b>ASK DEVI</b></button>
+<div id="devi-p" role="dialog" aria-label="Devi chat">
+ <div id="devi-h"><svg viewBox="0 0 48 48" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M24 2 28.5 12H19.5Z" stroke-width="1"/><path d="M10 3 13.5 11H6.5ZM38 3 41.5 11H34.5Z" stroke-width="1"/><path d="M10 10C10 21 14 27 24 27 34 27 38 21 38 10M24 12V46M19 40H29" fill="none" stroke-width="2.6"/></svg><div><strong>DEVI</strong><small>देवी · your TraceCDR guide</small></div><button id="devi-cl" title="New chat" aria-label="New chat">↺</button><button id="devi-x" aria-label="Close">×</button></div>
+ <div id="devi-m"></div><div id="devi-c"></div>
+ <form id="devi-f" autocomplete="off"><input id="devi-i" placeholder="Ask anything about TraceCDR…" maxlength="300"><button>ASK</button></form>
+</div>
+<script id="devi-js" src="./assets/js/devi.js"></script>
+
+<script id="lgn-js" src="./assets/js/login.js"></script>
+<script id="sa-js" src="./assets/js/superadmin.js"></script>
+<script id="rec-js" src="./assets/js/recording.js"></script>
+
+
+<div id="dfm"><div class="dc"><h3>Data file</h3>
+<p class="note" id="dfi"></p>
+<div class="note" id="dft"></div>
+<div class="row"><button class="btn" id="df1">Create / link a file (auto-save)</button><button class="btn g" id="df2">Open existing file…</button></div>
+<div class="row"><button class="btn g" id="df3">Save now</button><button class="btn g" id="df4">Download backup</button><button class="btn g" id="df6">Export case records (CSV)</button><button class="btn g" id="df5">Unlink</button></div>
+<label class="note" id="dfal" style="display:none"><input type="checkbox" id="dfa"> Download a backup automatically about 2 minutes after changes (for browsers that cannot auto-save to a file)</label>
+<div class="note">The file holds all cases, call records, deleted-case bin, deleted-record bin and the case record (audit log). Open it on any computer to continue the work.</div>
+<div class="row"><button class="btn g" id="dfx">Close</button></div>
+<input type="file" id="dfu" accept=".json,application/json" hidden></div></div>
+<script id="recedit-js" src="./assets/js/recording-editor.js"></script>
+</body>
+</html>

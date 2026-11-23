@@ -1,0 +1,138 @@
+TRACECDR: INSTALL GIT AND PUSH THIS PROJECT TO GITHUB
+===================================================
+
+This guide is for Windows and PowerShell. It explains how to install Git, prepare this project, create a GitHub repository, and push the project to it.
+
+IMPORTANT: KEEP SECRETS AND PRIVATE CDR DATA OFF GITHUB
+------------------------------------------------------
+The project includes a .gitignore file that excludes .env, node_modules, the local archive folder, and the named sample CDR files. Git will honor these rules. Before committing, always inspect the staged-file list. Do not add real CDR data, passwords, API keys, or the Supabase service-role key to GitHub.
+
+1. INSTALL GIT FOR WINDOWS
+-------------------------
+1. Open https://git-scm.com/download/win in your browser.
+2. Download and run the Git for Windows installer.
+3. The default installer options are suitable for this project; keep Git Credential Manager enabled so GitHub can sign you in through your browser. Complete the installation.
+4. Close and reopen PowerShell so it can find Git.
+5. Check that Git is installed:
+
+   git --version
+
+   PowerShell should print a version such as git version 2.x.x.windows.x. If it says that git is not recognized, reopen PowerShell or rerun the installer and ensure Git is added to PATH.
+
+2. CONFIGURE YOUR GIT IDENTITY
+------------------------------
+Set the name and email that Git will record on your commits. Use your own details:
+
+   git config --global user.name "Your Name"
+   git config --global user.email "you@example.com"
+   git config --global init.defaultBranch main
+
+Confirm the settings:
+
+   git config --global --list
+
+The commit email can be your GitHub private noreply address if you do not want your personal email shown in public commit history. Find it in GitHub Settings, Emails.
+
+3. CHECK THE PROJECT FOLDER
+---------------------------
+Open PowerShell and change to the folder where you extracted or saved TraceCDR. Replace the example path with your actual project folder:
+
+   Set-Location "C:\path\to\cdr"
+
+If you put the project somewhere else, replace that path with your project folder. Confirm you are in the project root:
+
+   Get-ChildItem
+
+You should see files such as package.json, README.md, .gitignore, and folders such as public, server, src, supabase, tests, and simulator.
+
+4. CREATE AN EMPTY GITHUB REPOSITORY
+------------------------------------
+1. Sign in at https://github.com/.
+2. Select the plus sign in the top-right corner, then select New repository.
+3. Enter a repository name, for example TraceCDR.
+4. Choose Private unless you have intentionally reviewed the project and want to publish it publicly.
+5. Do not select options to add a README, .gitignore, or license. This project already contains a README and .gitignore.
+6. Select Create repository.
+7. Keep the new repository page open. Copy its HTTPS URL. It looks like:
+
+   https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+
+5. INITIALIZE, REVIEW, AND COMMIT THE PROJECT
+---------------------------------------------
+In PowerShell, make sure you are in the project root, then initialize the local repository and stage the project files:
+
+   git init -b main
+   git add .
+
+Before committing, inspect what is staged:
+
+   git status --short
+   git diff --cached --name-only
+
+Check the list carefully. It should not contain .env, node_modules, archive, or local CDR datasets. The .env.example template is safe to include; the real .env file is not. The project's .gitignore excludes these local files when Git is used.
+
+If a private file appears in the staged list, unstage it before continuing. For example:
+
+   git rm --cached -- .env
+
+Replace .env with the path of the file you need to unstage. This leaves the local file on your computer. Review the staged list again before committing.
+
+When the staged list is safe, create the first commit:
+
+   git commit -m "Add TraceCDR project"
+
+6. CONNECT TO GITHUB AND PUSH
+-----------------------------
+Replace the example URL with the HTTPS URL copied from your new repository page:
+
+   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+   git push -u origin main
+
+Git Credential Manager may open a browser window for GitHub sign-in and authorization. Complete that sign-in. GitHub does not accept your account password as a Git password; use the browser authorization prompt rather than pasting a password into PowerShell.
+
+When the push succeeds, refresh the GitHub repository page. You should see README.md, public, server, src, supabase, tests, and the other project files.
+
+If Git reports that origin already exists, update it and retry:
+
+   git remote set-url origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+   git push -u origin main
+
+If Git reports that the remote contains a README or other initial commit, the GitHub repository was not empty. The easiest fix for a new project is to create a second empty repository without initializing files, then use its URL as origin.
+
+7. PUSH LATER CHANGES
+---------------------
+After editing project files, run these commands from the project folder:
+
+   git status --short
+   git add .
+   git status --short
+   git commit -m "Describe your change"
+   git push
+
+Always review the staged-file list before committing, especially if you imported CDR records or changed .env.
+
+8. DOWNLOAD THE PROJECT LATER
+-----------------------------
+With Git installed, download a copy by running this in PowerShell:
+
+   git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+
+This creates a new folder containing the project. To get the latest changes later, open PowerShell in that folder and run:
+
+   git pull
+
+You can also download a ZIP from the repository page using Code, then Download ZIP. A ZIP is useful for viewing or running the files, but it does not include Git history and is not the normal way to push changes back.
+
+9. RUN THE STATIC APP AFTER DOWNLOADING
+--------------------------------------
+GitHub stores the project; Vercel hosts the frontend and Supabase hosts the backend. Install Node.js 22 or newer, configure a local .env using .env.example and your public Supabase project settings, then run:
+
+   npm ci
+   npm run build
+   python -m http.server 3000 --directory public
+
+Open http://localhost:3000 in your browser. Follow DEPLOYMENT.md to apply all three Supabase migrations, deploy the Edge Functions, and configure Vercel. Do not open public/index.html directly as a file:// page.
+
+IF YOU ACCIDENTALLY PUSH A SECRET
+---------------------------------
+Removing a secret in a later commit does not erase it from earlier Git history. Immediately rotate or revoke the exposed key/password in the service that issued it, then follow GitHub's guidance for removing sensitive data from repository history. Do not rely on deleting the file alone.
