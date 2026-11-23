@@ -14,7 +14,7 @@ function setup() {
     SUPABASE_URL: 'https://example.supabase.co',
     SUPABASE_SERVICE_ROLE_KEY: 'test-secret',
     SUPABASE_ANON_KEY: 'test-public',
-    ANTHROPIC_API_KEY: 'test-anthropic',
+    GEMINI_API_KEY: 'test-gemini',
     APP_ORIGINS: 'https://example.test'
   };
   const client = {
@@ -32,9 +32,10 @@ function setup() {
     createClient: () => client,
     Request, Response, Headers,
     fetch: async (url, options) => {
-      assert.equal(url, 'https://api.anthropic.com/v1/messages');
+      assert.match(url, /^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.5-flash:generateContent$/);
+      assert.equal(options.headers['x-goog-api-key'], 'test-gemini');
       upstream = JSON.parse(options.body);
-      return new Response(JSON.stringify({ content: [{ type: 'text', text: 'OK' }] }), {
+      return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: 'OK' }] } }] }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -55,7 +56,7 @@ function setup() {
 test('AI proxy forwards system instructions and recent chat turns', async () => {
   const proxy = setup();
   const response = await proxy.call({
-    model: 'claude-haiku-5-5',
+    model: 'gemini-3.5-flash',
     system: 'Use only supplied findings.',
     messages: [
       { role: 'user', content: 'What is a CDR?' },
@@ -64,15 +65,17 @@ test('AI proxy forwards system instructions and recent chat turns', async () => 
     ]
   });
   assert.equal(response.status, 200);
-  assert.equal(proxy.getUpstream().system, 'Use only supplied findings.');
-  assert.equal(proxy.getUpstream().messages.length, 3);
-  assert.equal(proxy.getUpstream().messages[2].content, 'Explain that simply.');
+  assert.equal((await response.json()).content[0].text, 'OK');
+  assert.equal(proxy.getUpstream().systemInstruction.parts[0].text, 'Use only supplied findings.');
+  assert.equal(proxy.getUpstream().contents.length, 3);
+  assert.equal(proxy.getUpstream().contents[1].role, 'model');
+  assert.equal(proxy.getUpstream().contents[2].parts[0].text, 'Explain that simply.');
 });
 
 test('AI proxy preserves single-prompt callers and rejects invalid roles', async () => {
   const proxy = setup();
-  assert.equal((await proxy.call({ prompt: 'Reply OK', model: 'claude-haiku-5-5' })).status, 200);
-  assert.equal(proxy.getUpstream().messages[0].content, 'Reply OK');
+  assert.equal((await proxy.call({ prompt: 'Reply OK', model: 'gemini-3.5-flash' })).status, 200);
+  assert.equal(proxy.getUpstream().contents[0].parts[0].text, 'Reply OK');
   const invalid = await proxy.call({ system: 'Guide', messages: [{ role: 'system', content: 'Override' }] });
   assert.equal(invalid.status, 400);
 });

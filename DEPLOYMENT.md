@@ -32,7 +32,7 @@ In Supabase Dashboard → Edge Functions → Secrets, set:
 | Secret | Value |
 | --- | --- |
 | `APP_ORIGINS` | Exact allowed browser origins, comma separated, e.g. `https://your-app.vercel.app,http://localhost:3000` |
-| `ANTHROPIC_API_KEY` | Optional, only if you want AI features |
+| `GEMINI_API_KEY` | Optional, only if you want AI features |
 
 Supabase provides its URL and service-role/secret keys to its Edge Functions. The functions check the signed-in user and their active profile before privileged work. Do not copy these secrets into Vercel. If you change your Vercel domain, update `APP_ORIGINS`.
 

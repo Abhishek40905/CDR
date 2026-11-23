@@ -88,7 +88,7 @@ function tabRules(){const el=$('dsb2'),R=RULES,WL=[['hs','More than one handset'
 function tabAI(){const el=$('dsb2');
  const s=sess();
  el.innerHTML=`<p class="note">AI requests use an authenticated Supabase Edge Function with a Supabase-held API key. The key is never sent to the browser.</p>
- <div class="mg"><label>Backend AI Proxy<input type="text" value="Supabase Edge Function: ai-proxy" disabled></label><label>Model Selection<select id="amd"><option value="claude-haiku-5-5">claude-haiku-5-5 (Fast)</option><option value="claude-sonnet-4-6">claude-sonnet-4-6 (High Precision Forensics)</option></select></label></div>
+ <div class="mg"><label>Backend AI Proxy<input type="text" value="Supabase Edge Function: ai-proxy" disabled></label><label>Model Selection<select id="amd"><option value="gemini-3.5-flash">Gemini 3.5 Flash</option><option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (Fast)</option></select></label></div>
  <div class="row"><span class="tag" style="background:rgba(25,211,162,0.12);color:#19d3a2;border-color:#19d3a2">Server-Managed Key</span><span class="note" id="akm">Authenticated as ${s?esc(s.u):'Local'} (${s?esc(s.role):'unauthenticated'})</span></div>
  <h4 class="gh">AI Testing</h4>
  <div class="row"><button class="btn" id="at1">1 · Test Proxy Connection</button><button class="btn" id="at2">2 · Test AI Brief on Data</button><button class="btn" id="at3">3 · Run Engine Self-Test</button></div>

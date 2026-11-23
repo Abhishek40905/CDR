@@ -754,7 +754,7 @@ async function aiBrief(p){
     }
     const prompt = 'You are a forensic CDR analyst. In under 90 words write an intelligence brief using ONLY these facts: ' + JSON.stringify({number:p.n,calls:p.O.length,contacts:p.ct.length,handsets:p.im.length,sims:p.is.length,towers:p.tw.length,regions:p.reg,flags:p.f,risk:p.score});
     if (!s || !s.sb || !window.sb) return localBrief(p);
-    const result = await window.sb.functions.invoke('ai-proxy', { body:{ prompt:prompt, model:'claude-haiku-5-5' } });
+    const result = await window.sb.functions.invoke('ai-proxy', { body:{ prompt:prompt, model:'gemini-3.5-flash-lite' } });
     if (result.error) return localBrief(p);
     const d = result.data || {};
     return (d.content && d.content.map(i => i.text || '').join('').trim()) || localBrief(p);

@@ -54,7 +54,7 @@ python -m http.server 3000 --directory public
 
 Open `http://localhost:3000`. `npm start` still runs the legacy Express service for local/API compatibility; Vercel does not run it. Run `npm test` for the existing Node tests.
 
-The build writes `public/config.js`, containing only the public Supabase URL and key. `.env`, `public/config.js`, imported CDR datasets, and `archive/` are excluded from Git. Keep Supabase secret/service-role keys and `ANTHROPIC_API_KEY` in Supabase Edge Functions, never in Vercel or browser files.
+The build writes `public/config.js`, containing only the public Supabase URL and key. `.env`, `public/config.js`, imported CDR datasets, and `archive/` are excluded from Git. Keep Supabase secret/service-role keys and `GEMINI_API_KEY` in Supabase Edge Functions, never in Vercel or browser files.
 
 ## Files
 

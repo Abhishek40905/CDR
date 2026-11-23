@@ -51,15 +51,15 @@ async function authorize(req: Request, roles: string[]) {
   return { user: identity.user, profile, admin };
 }
 
-const models = ['claude-haiku-5-5', 'claude-sonnet-4-6'];
+const models = ['gemini-3.5-flash', 'gemini-3.5-flash-lite'];
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(req) });
   if (req.method !== 'POST') return json(req, { error: 'POST required.' }, 405);
   const access = await authorize(req, ['analyst', 'superadmin']);
   if ('error' in access) return json(req, { error: access.error }, access.status);
-  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
-  if (!apiKey) return json(req, { error: 'ANTHROPIC_API_KEY is not set in Supabase Edge Function secrets.' }, 503);
+  const apiKey = Deno.env.get('GEMINI_API_KEY');
+  if (!apiKey) return json(req, { error: 'GEMINI_API_KEY is not set in Supabase Edge Function secrets.' }, 503);
 
   try {
     const body = await req.json();
@@ -83,19 +83,30 @@ Deno.serve(async (req) => {
     if (!models.includes(model) || (!hasConversation && !hasPrompt)) {
       return json(req, { error: 'Valid prompt or conversation and supported model required.' }, 400);
     }
-    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+    const contents = hasConversation
+      ? messages.map((message: { role: string; content: string }) => ({
+        role: message.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: message.content }]
+      }))
+      : [{ role: 'user', parts: [{ text: prompt }] }];
+    const upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'x-goog-api-key': apiKey
       },
-      body: JSON.stringify(hasConversation
-        ? { model, max_tokens: 1024, system, messages }
-        : { model, max_tokens: 1024, messages: [{ role: 'user', content: prompt }] })
+      body: JSON.stringify({
+        ...(hasConversation ? { systemInstruction: { parts: [{ text: system }] } } : {}),
+        contents,
+        generationConfig: { maxOutputTokens: 1024 }
+      })
     });
     const data = await upstream.json();
-    return json(req, data, upstream.status);
+    if (!upstream.ok) return json(req, { error: data.error?.message || 'Gemini request failed.' }, upstream.status);
+    const answer = (data.candidates?.[0]?.content?.parts || [])
+      .map((part: { text?: string }) => part.text || '').join('').trim();
+    if (!answer) return json(req, { error: 'Gemini returned no text for this request.' }, 502);
+    return json(req, { content: [{ type: 'text', text: answer }] });
   } catch (error) {
     return json(req, { error: error instanceof Error ? error.message : 'AI request failed.' }, 500);
   }

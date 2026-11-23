@@ -39,6 +39,7 @@ test('AI request includes recent turns and labelled source examples', async () =
   const answer = await context.chatbot.ai('Explain the score');
 
   assert.equal(answer, 'Answer from source');
+  assert.equal(sent.model, 'gemini-3.5-flash');
   assert.equal(sent.messages.length, 3);
   assert.equal(sent.messages[0].content, 'What is this?');
   assert.equal(sent.messages[1].content, 'A CDR record.');
